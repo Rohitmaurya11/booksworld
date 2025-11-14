@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row">
+
+        <div class="col-md-4">
+            {% if book.cover_image %}
+            <img src="{{ book.cover_image.url }}" class="img-fluid rounded shadow">
+            {% else %}
+            <img src="{% static 'no-image.png' %}" class="img-fluid rounded">
+            {% endif %}
+        </div>
+
+        <div class="col-md-8">
+            <h2>{{ book.title }}</h2>
+            <h5 class="text-muted">By {{ book.author }}</h5>
+
+            <p><strong>Category:</strong> {{ book.category }}</p>
+            <p><strong>Published On:</strong> {{ book.publish_date }}</p>
+            <p>{{ book.description }}</p>
+
+            <p><strong>Views:</strong> {{ book.views }}</p>
+            <p><strong>Downloads:</strong> {{ book.downloads }}</p>
+
+            {% if book.book_file %}
+            <a href="{% url 'download_book' book.id %}" class="btn btn-success mt-2">
+                📥 Download Book
+            </a>
+            {% else %}
+            <p class="text-danger">No book file uploaded.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

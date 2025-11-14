@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- ADMIN NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    
+    <a class="navbar-brand" href="{% url 'admin_dashboard' %}">
+      👑 Admin Panel
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="adminNavbar">
+
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin_dashboard' %}">Dashboard</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Manage Users</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Manage Categories</a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#">Analytics</a>
+        </li>
+
+      </ul>
+
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <span class="nav-link text-warning">
+            Welcome, {{ request.user.username }}
+          </span>
+        </li>
+
+        <li class="nav-item">
+          <a class="btn btn-danger btn-sm ms-2" href="{% url 'logout' %}">
+            Logout
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+<!-- spacing -->
+<div style="margin-top: 80px;"></div>
+
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">👑 Admin Dashboard</h2>
+
+    <!-- All Books -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5>All Books</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Publish Date</th>
+                        <th>Description</th>
+                        <th>Created By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.author }}</td>
+                        <td>{{ book.publish_date }}</td>
+                        <td>{{ book.description }}</td>
+                        <td>{{ book.created_by.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+</div>
+<footer class="footer mt-5 text-center text-white bg-dark p-3">
+    <p>Total Page Visits: {{ visitor_count }}</p>
+</footer>
+
+{% endblock %}
