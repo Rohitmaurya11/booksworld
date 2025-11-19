@@ -65,3 +65,18 @@ class VisitorCount(models.Model):
 
     def __str__(self):
         return f"Visitors: {self.count}"
+
+class Complaint(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    book_title = models.CharField(max_length=255)
+    complaint_type = models.CharField(max_length=100, choices=[
+        ('missing', 'Missing Book'),
+        ('wrong_info', 'Wrong Information'),
+        ('quality', 'Bad Quality'),
+        ('other', 'Other Issue'),
+    ])
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.book_title

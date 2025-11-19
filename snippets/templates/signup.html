@@ -1,18 +1,146 @@
-{% extends "index.html" %}
+{% load static %}
 {% load crispy_forms_tags %}
 
-{% block start %}
-<div class="content-section col-md-8 col-md-offset-2">
-  <form method="POST" style="border: 1px solid black; margin: 4%; padding:10%; border-radius:1%;">
-    {% csrf_token %}
-    <fieldset class="form-group">
-      {{ form|crispy }}
-    </fieldset>
-    <center>
-      <button style="background: black; padding:2%; font-size: 2rem; color:white;" class="btn btn-outline-info" type="submit"><span class="glyphicon glyphicon-check"></span>   sign up</button>
-    </center>
-    <br />
-    <sub><a href="{% url 'login' %}" style="text-decoration: none; color: blue; padding:3%; cursor:pointer;">Already have an account ?</a></sub>
-  </form>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Book World</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+            background: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .signup-container {
+            width: 420px;
+            padding: 30px 35px;
+            border-radius: 15px;
+            background: #ffffff;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.15);
+            border: 1px solid #ececec;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 26px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #555;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+
+        .message-box {
+            background: #ff4d4d;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        form {
+            width: 100%;
+        }
+
+        /* CRISPY FORMS INPUT FIXES */
+        .form-control {
+            width: 100% !important;
+            padding: 10px !important;
+            border: 1px solid #ccc !important;
+            border-radius: 8px !important;
+            background: #fafafa !important;
+            color: #333 !important;
+            font-size: 14px !important;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd !important;
+            outline: none !important;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #0d6efd;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 17px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background: #084298;
+        }
+
+        .extra-links {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        .extra-links a {
+            text-decoration: none;
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .extra-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="signup-container">
+
+    <h2>Join Book World</h2>
+    <p class="subtitle">Create an account to explore books</p>
+
+    <!-- Show messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message-box">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Render Django Form -->
+        {{ form|crispy }}
+
+        <button type="submit" class="btn-submit">Sign Up</button>
+    </form>
+
+    <div class="extra-links">
+        Already have an account?
+        <a href="{% url 'login' %}">Login here</a>
+    </div>
+
 </div>
-{% endblock start %}
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Book, UserProfile, VisitorCount
+from .models import Book, UserProfile, VisitorCount,Complaint
 
 
 # ======================= BOOK ADMIN =======================
@@ -61,9 +61,12 @@ class VisitorCountAdmin(admin.ModelAdmin):
     list_display = ('id', 'count')
     readonly_fields = ('count',)
 
+class ComplaintAdmin(admin.ModelAdmin):
+    list_display = ('user', 'book_title', 'complaint_type', 'message', 'created_at')
 
 # ======================= REGISTER MODELS =======================
 
 admin.site.register(Book, BookAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(VisitorCount, VisitorCountAdmin)
+admin.site.register(Complaint, ComplaintAdmin)

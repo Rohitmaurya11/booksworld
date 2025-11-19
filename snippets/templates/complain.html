@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Complaint</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #cbd4eb;
+            font-family: "Segoe UI", sans-serif;
+        }
+        .complaint-box {
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.08);
+            margin-top: 60px;
+        }
+        .btn-submit {
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 10px;
+        }
+        .btn-submit:hover {
+            background: #0948b6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="{% url 'index' %}">📚 Book World</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavBar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavBar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'category' %}">
+                        <i class="bi bi-book-half"></i> Categories
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about' %}">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'contact' %}">
+                        <i class="bi bi-chat-text"></i> Contact
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                        <strong>{{ user.username }}</strong>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+
+<div class="container col-md-6">
+
+    <div class="complaint-box">
+
+        <h3 class="text-center mb-3">📢 Submit a Complaint</h3>
+
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-success">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Book Title</label>
+                <input name="book_title" type="text" class="form-control" required placeholder="Enter the book title">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Complaint Type</label>
+                <select class="form-select" name="complaint_type" required>
+                    <option value="missing">Missing Book</option>
+                    <option value="wrong_info">Wrong Information</option>
+                    <option value="quality">Bad Quality</option>
+                    <option value="other">Other Issue</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Describe Your Issue</label>
+                <textarea name="message" class="form-control" rows="4" required placeholder="Describe the problem..."></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-submit w-100 p-2">Submit Complaint</button>
+
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>
