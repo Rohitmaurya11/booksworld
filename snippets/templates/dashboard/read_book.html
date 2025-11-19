@@ -1,0 +1,28 @@
+
+{% block content %}
+{% load static %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">{{ book.title }}</h2>
+    <h5 class="text-muted">By {{ book.author }}</h5>
+
+    <hr>
+
+    <h4>📖 Read Book</h4>
+
+    {% if book.book_file %}
+        <!-- DISPLAY PDF FROM DB -->
+        <iframe 
+            src="{{ book.book_file.url }}" 
+            width="100%" 
+            height="700px"
+            style="border: 1px solid #ccc; border-radius: 8px;">
+        </iframe>
+    {% else %}
+        <p class="text-danger">No book file uploaded.</p>
+    {% endif %}
+
+</div>
+
+{% endblock %}

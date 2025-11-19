@@ -1,0 +1,28 @@
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch and 'origin/main' have diverged,
+# and have 1 and 3 different commits each, respectively.
+#
+# Changes to be committed:
+#	new file:   books/rich-dad-poor-dad.pdf
+#	new file:   media/book_covers/rich_dad_poor_dad.jpg
+#	new file:   media/book_covers/the_hidden_hindu.jpg
+#	new file:   media/book_covers/the_hidden_hindu_2.jpg
+#	new file:   media/book_files/771218166-PDF-the-Hidden-Hindu-Book-Hindi.pdf
+#	new file:   media/book_files/The_Hidden_Hindu_All_parts_Hindi_www.The-Gyan.in.pdf
+#	new file:   media/book_files/rich-dad-poor-dad.pdf
+#	new file:   snippets/migrations/0007_complaint.py
+#	new file:   snippets/migrations/__pycache__/0007_complaint.cpython-313.pyc
+#	new file:   snippets/static/logo.png
+#	new file:   snippets/templates/category.html
+#	new file:   snippets/templates/dashboard/add_book.html
+#	new file:   snippets/templates/dashboard/admin_complaints.html
+#	new file:   snippets/templates/dashboard/analytics.html
+#	new file:   snippets/templates/dashboard/edit_book.html
+#	new file:   snippets/templates/dashboard/manage_users.html
+#	new file:   snippets/templates/dashboard/my_books.html
+#	new file:   snippets/templates/dashboard/read_book.html
+#

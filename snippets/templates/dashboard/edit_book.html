@@ -1,0 +1,67 @@
+<style>
+
+h2{
+    text-align: center;
+    font-family:'Times New Roman', Times, serif;
+
+}
+.form{
+    font-family:'Times New Roman', Times, serif;
+    display: grid;
+    max-width: 850px;
+    color: black;
+    font-weight: 700;
+    font-size: 24px;
+    gap: 10px;
+
+    border: 2px solid;
+    display:flexbox;
+    margin: 30px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
+}
+a{
+    text-decoration: underline;
+    text-align: center;
+}
+input,textarea{
+
+    font-family:'Times New Roman', Times, serif;
+    font-size: 16px;
+    border-radius: 2px;
+    border: 2px solid black;
+
+}
+
+
+</style>
+<h2 class="text-primary fw-bold ">✏ Edit Book</h2>
+
+<form class="form" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label class="form-label">Book Title</label>
+    <input type="text" name="title" value="{{ book.title }}" class="form-control mb-3">
+
+    <label class="form-label">Author</label>
+    <input type="text" name="author" value="{{ book.author }}" class="form-control mb-3">
+
+    <!-- <label class="form-label">Publish Date</label> -->
+    <!-- <input type="date" name="publish_date" value="{{ book.publish_date }}" class="form-control mb-3"> -->
+
+    <label class="form-label">Category</label>
+    <select name="category" class="form-control mb-3">
+        {% for key, value in categories %}
+            <option value="{{ key }}" {% if book.category == key %}selected{% endif %}>{{ value }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Description</label>
+    <textarea name="description" class="form-control mb-3">{{ book.description }}</textarea><br>
+
+    <button class="btn btn-primary">Update Book</button>
+    <br>
+    <a href="{% url 'my_books' %}" class="btn btn-secondary">Back</a>
+</form>
