@@ -1,166 +1,276 @@
-<style>
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Books</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Bootstrap (if not already included in base) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
     body {
-        background: #eef1f7;
-        font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f6f9ff, #eef2ff);
+      font-family: "Poppins", sans-serif;
+      min-height: 100vh;
     }
 
+    /* Title */
     .page-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #333;
+      font-size: 32px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #4f7cff, #6236ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .back-btn {
-        font-size: 14px;
-        padding: 6px 12px;
-        border-radius: 10px;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
     }
 
+    .back-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Card */
     .books-card {
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 18px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-        backdrop-filter: blur(5px);
+      background: rgba(255, 255, 255, 0.85);
+      padding: 35px;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.07);
+      backdrop-filter: blur(10px);
     }
 
-    .table thead {
-        background: linear-gradient(120deg, #4f7cff, #6236ff);
-        color: white;
-        border-radius: 10px;
-    }
-
-    th:first-child {
-        border-radius: 10px 0 0 10px !important;
-    }
-
-    th:last-child {
-        border-radius: 0 10px 10px 0 !important;
-    }
-
-    .table tbody tr:hover {
-        background: #f1f4ff;
-        transition: .3s ease;
-    }
-
-    .book-img {
-        width: 65px;
-        height: 85px;
-        border-radius: 10px;
-        object-fit: cover;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
-    .action-btn {
-        padding: 6px 12px;
-        border-radius: 8px;
-        font-size: 13px;
-        margin-right: 4px;
-    }
-
-    .btn-edit {
-        background: #ffd966;
-        color: #7a5d00;
-    }
-
-    .btn-edit:hover {
-        background: #ffcc33;
-        color: #5c4500;
-    }
-
-    .btn-delete {
-        background: #ff6b6b;
-        color: white;
-    }
-
-    .btn-delete:hover {
-        background: #ff4b4b;
-        color: white;
-    }
-
+    /* Add Button */
     .btn-add {
-        background: #4CAF50;
-        color: white;
-        border-radius: 10px;
-        padding: 8px 15px;
-        font-size: 15px;
-        font-weight: 500;
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      color: white;
+      border-radius: 14px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+      text-decoration: none;
     }
 
     .btn-add:hover {
-        background: #43a047;
-        color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(76, 175, 80, 0.4);
+      color: white;
     }
 
-</style>
+    /* Table Wrapper */
+    .table-wrapper {
+      overflow-x: auto;
+    }
 
+    table {
+      border-collapse: separate;
+      border-spacing: 0 15px;
+    }
 
-<div class="container mt-5">
-    
+    thead th {
+      border: none;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6c757d;
+      font-weight: 600;
+    }
+
+    tbody tr {
+      background: #ffffff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 16px;
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    }
+
+    tbody td {
+      border: none !important;
+      padding: 18px;
+      vertical-align: middle;
+    }
+
+    tbody tr td:first-child {
+      border-radius: 16px 0 0 16px;
+    }
+
+    tbody tr td:last-child {
+      border-radius: 0 16px 16px 0;
+    }
+
+    /* Book Image */
+    .book-img {
+      width: 65px;
+      height: 90px;
+      border-radius: 12px;
+      object-fit: cover;
+      transition: 0.3s ease;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    }
+
+    .book-img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Badge */
+    .custom-badge {
+      padding: 6px 12px;
+      font-weight: 500;
+      border-radius: 12px;
+      font-size: 12px;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+      border-radius: 10px;
+      font-size: 13px;
+      padding: 7px 14px;
+      transition: 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-edit {
+      background: #fff8e1;
+      color: #ff9800;
+    }
+
+    .btn-edit:hover {
+      background: #ffe082;
+      transform: translateY(-2px);
+    }
+
+    .btn-delete {
+      background: #ffebee;
+      color: #e53935;
+    }
+
+    .btn-delete:hover {
+      background: #ffcdd2;
+      transform: translateY(-2px);
+    }
+
+    /* Empty State */
+    .empty-state {
+      padding: 50px;
+      text-align: center;
+      color: #9e9e9e;
+      font-size: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .page-title {
+        font-size: 24px;
+      }
+
+      tbody td {
+        padding: 12px;
+      }
+
+      .books-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-5">
     <!-- Title Row -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="page-title">📘 Manage Books</h2>
-        <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-dark back-btn">⬅ Back to Dashboard</a>
-    </div><br>
+      <h2 class="page-title">📘 Manage Books</h2>
+      <a href="{% url 'manager_dashboard' %}" class="btn btn-outline-dark back-btn">
+        ⬅ Back to Dashboard
+      </a>
+    </div>
 
     <!-- Main Card -->
     <div class="books-card">
+      <div class="d-flex justify-content-end mb-4">
+        <a href="{% url 'add_book' %}" class="btn-add"> ➕ Add New Book </a>
+      </div>
 
-        <div class="d-flex justify-content-end mb-4">
-            <a href="{% url 'add_book' %}" class="btn-add">➕ Add New Book</a>
-        </div>
-        <br>
+      <div class="table-wrapper">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Category</th>
+              <th>Publish Date</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
 
-        <table class="table table-hover align-middle">
-            <thead>
-                <tr>
-                    <th>Cover</th>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Category</th>
-                    <th>Publish Date</th>
-                    <th class="text-center">Actions</th>
-                </tr>
-            </thead>
-
-            <tbody>
+          <tbody>
             {% for book in books %}
-                <tr>
+            <tr>
+              <td>
+                {% if book.cover_image %}
+                <img src="{{ book.cover_image.url }}" loading="lazy" class="book-img" />
+                {% else %}
+                <span class="text-muted">No Image</span>
+                {% endif %}
+              </td>
+              <td class="fw-semibold">{{ book.title }}</td>
 
-                    <td>
-                        {% if book.cover_image %}
-                            <img src="{{ book.cover_image.url }}" class="book-img">
-                        {% else %}
-                            <span class="text-muted">No Image</span>
-                        {% endif %}
-                    </td>
+              <td class="text-muted">{{ book.author }}</td>
 
-                    <td class="fw-semibold">{{ book.title }}</td>
-                    <td class="text-muted">{{ book.author }}</td>
-                    <td><span class="badge bg-primary">{{ book.get_category_display }}</span></td>
-                    <td>{{ book.publish_date }}</td>
+              <td>
+                <span class="custom-badge">
+                  {{ book.category.name }}
+                </span>
+              </td>
 
-                    <td class="text-center">
+              <td>{{ book.publish_date }}</td>
 
-                        <!-- EDIT BUTTON -->
-                        <a href="{% url 'edit_book' book.id %}" 
-                           class="btn action-btn btn-edit">
-                           ✏ Edit
-                        </a>
+              <td class="text-center">
+                <a href="{% url 'edit_book' book.id %}" class="action-btn btn-edit">
+                  ✏ Edit
+                </a>
 
-                        <!-- DELETE BUTTON -->
-                        <a href="{% url 'delete_book' book.id %}" 
-                           class="btn action-btn btn-delete"
-                           onclick="return confirm('Delete this book?')">
-                           🗑 Delete
-                        </a>
+                <a href="{% url 'delete_book' book.id %}" class="action-btn btn-delete"
+                  onclick="return confirm('Delete this book?');">
+                  🗑 Delete
+                </a>
+              </td>
+            </tr>
 
-                    </td>
+            {% empty %}
 
-                </tr>
+            <tr>
+              <td colspan="6">
+                <div class="empty-state">
+                  📚 No books available yet.<br />
+                  Click “Add New Book” to get started.
+                </div>
+              </td>
+            </tr>
+
             {% endfor %}
-            </tbody>
+          </tbody>
         </table>
-
+      </div>
     </div>
-</div>
+  </div>
+</body>
+
+</html>

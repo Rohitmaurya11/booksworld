@@ -1,6 +1,6 @@
 {% load static %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,22 +19,88 @@
         font-family: "Segoe UI", sans-serif;
       }
 
+      /* ================= ADMIN NAVBAR ================= */
+
+      .navbar {
+        background: linear-gradient(135deg, #1f2937, #111827) !important;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        padding: 14px 0;
+      }
+
       .navbar-brand {
         font-size: 22px;
-        font-weight: bold;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      /* NAV LINKS */
+      .navbar .nav-link {
+        position: relative;
+        font-weight: 500;
+        margin-right: 15px;
+        transition: 0.3s ease;
+      }
+
+      .navbar .nav-link:hover {
+        color: #ffffff !important;
+      }
+
+      /* Animated underline */
+      .navbar .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 0%;
+        height: 2px;
+        background: #4f7cff;
+        transition: width 0.3s ease;
+      }
+
+      .navbar .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* Active link underline always visible */
+      .navbar .nav-link.active::after {
+        width: 100%;
+      }
+
+      /* ================= USER SECTION ================= */
+
+      .welcome-text {
+        font-weight: 500;
+        color: #facc15 !important;
+        margin-right: 10px;
+      }
+
+      .logout-btn {
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-weight: 500;
+        transition: 0.3s ease;
+      }
+
+      .logout-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+      }
+
+      /* ================= TABLE CARD ================= */
+
+      .card {
+        border: none;
+        border-radius: 16px;
       }
 
       .card-header {
         font-weight: 600;
+        border-radius: 16px 16px 0 0 !important;
       }
 
       .table td,
       .table th {
         vertical-align: middle;
-      }
-
-      footer {
-        margin-top: 40px;
       }
     </style>
   </head>
@@ -58,26 +124,30 @@
 
         <div class="collapse navbar-collapse" id="adminNavbar">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link active" href="{% url 'admin_dashboard' %}"
                 >Dashboard</a
               >
-            </li>
+            </li> -->
 
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'manage_users' %}">Manage Users</a>
+              <a class="nav-link" href="{% url 'manage_users' %}"
+                >Manage Users</a
+              >
             </li>
             <li class="nav-item">
               <a
                 class="nav-link {% if request.resolver_match.url_name == 'add_book' %}active{% endif %}"
-                href="{% url 'add_book' %}"
+                href="{% url 'admin_add_book' %}"
               >
                 Add New Book
               </a>
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'category' %}">Manage Categories</a>
+              <a class="nav-link" href="{% url 'admin_manage_category' %}"
+                >Manage Categories</a
+              >
             </li>
 
             <li class="nav-item">
@@ -90,17 +160,20 @@
             </li>
           </ul>
 
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-center">
             <li class="nav-item">
-              <span class="nav-link text-warning"
-                >Welcome, {{ request.user.username }}</span
-              >
+              <span class="nav-link welcome-text">
+                👋 {{ request.user.username }}
+              </span>
             </li>
 
             <li class="nav-item">
-              <a class="btn btn-danger btn-sm ms-2" href="{% url 'logout' %}"
-                >Logout</a
+              <a
+                class="btn btn-danger btn-sm logout-btn ms-2"
+                href="{% url 'logout' %}"
               >
+                Logout
+              </a>
             </li>
           </ul>
         </div>
@@ -122,7 +195,6 @@
                 <th>Category</th>
                 <th>Uploaded By</th>
                 <th>Actions</th>
-
               </tr>
             </thead>
 
@@ -147,7 +219,7 @@
                 <td>{{ book.title }}</td>
                 <td>{{ book.author }}</td>
                 <td>{{ book.category }}</td>
-                <td>{{ book.uploaded_by.username }}</td>
+                <td>{{ book.created_by.username }}</td>
 
                 <td>
                   <a
@@ -158,7 +230,9 @@
                   <a
                     href="{% url 'delete_book' book.id %}"
                     class="btn btn-sm btn-danger"
-                    onclick="return confirm('Are you sure you want to delete?')"
+                    onclick="
+                      return confirm('Are you sure you want to delete?');
+                    "
                     >🗑 Delete</a
                   >
                 </td>

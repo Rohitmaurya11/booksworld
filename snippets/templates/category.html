@@ -1,117 +1,297 @@
 {% load static %}
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Categories</title>
+  <meta charset="UTF-8" />
+  <title>Book Categories</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <style>
-        body { background: #cbd4eb; font-family: 'Poppins', sans-serif; }
-        .header { 
-            font-size: 15px;
-            padding: 10px 0; 
-            background: linear-gradient(135deg, #5078a3, #8e5ae2); 
-            color: white; 
-            text-align: center;
-            
-         }
-         h1{
-            font-size: 20px;
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-         }
-        .category-title { font-size: 28px; font-weight: 600; margin-bottom: 10px; }
-        .book-card { background: white; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s; padding: 12px; }
-        .book-card:hover { transform: translateY(-4px); }
-        .empty-text { color: #888; font-style: italic; }
-        .book-card img {
-    width: 100%;
-    height: 220px;          /* Perfect height */
-    object-fit: contain;    /* Prevent blur/stretch */
-    background-color: #fafafa;
-    padding: 8px;
-    border-radius: 10px;
-    border: 1px solid #eee;
-}
-    </style>
+  <style>
+    body {
+      background: #cbd4eb;
+      font-family: "Poppins", sans-serif;
+      padding-top: 80px;
+    }
+
+    /* ================= NAVBAR ================= */
+
+    .navbar-modern {
+      background: #506dab;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      padding: 12px 0;
+    }
+
+    .navbar-modern .navbar-brand {
+      font-weight: 600;
+      font-size: 20px;
+      color: white;
+    }
+
+    .navbar-modern .nav-link {
+      color: #e5e7eb !important;
+      font-weight: 500;
+      margin-left: 18px;
+      position: relative;
+      transition: 0.3s ease;
+    }
+
+    .navbar-modern .nav-link:hover {
+      color: white !important;
+    }
+
+    .navbar-modern .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: white;
+      transition: 0.3s ease;
+    }
+
+    .navbar-modern .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* ===== USER DROPDOWN STYLE ===== */
+
+    .user-link {
+      display: flex;
+      align-items: center;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f7cff, #6236ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .user-dropdown {
+      border-radius: 12px;
+      border: none;
+      padding: 8px 0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .user-dropdown .dropdown-item {
+      font-size: 14px;
+      padding: 8px 18px;
+      transition: 0.2s ease;
+    }
+
+    .user-dropdown .dropdown-item:hover {
+      background: #f3f4f6;
+    }
+
+    /* ================= HEADER ================= */
+
+    .header {
+      padding: 50px 20px;
+      background: linear-gradient(135deg, #5078a3, #8e5ae2);
+      color: white;
+      text-align: center;
+      border-radius: 20px;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 30px;
+      font-weight: 600;
+    }
+
+    .header p {
+      margin-top: 10px;
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    /* ================= CATEGORY SECTION ================= */
+
+    .category-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .book-card {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      transition: 0.3s ease;
+      padding: 15px;
+      text-align: center;
+      height: 380px;
+      /* FIXED HEIGHT */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .book-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .book-link:hover {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      background-color: #fafafa;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+
+    .book-card h5 {
+      font-weight: 600;
+      margin-top: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      /* show only 2 lines */
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-height: 48px;
+      /* keeps title area consistent */
+    }
+
+    .book-card p {
+      font-size: 14px;
+    }
+
+    .empty-text {
+      color: #777;
+      font-style: italic;
+    }
+  </style>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
+  <!-- ================= NAVBAR ================= -->
 
-        <a class="navbar-brand" href="{% url 'index' %}">📚 Book World</a>
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-modern fixed-top">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'index' %}">
+        📚 <strong>Book</strong> World
+      </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <div class="collapse navbar-collapse" id="navBar">
-            <ul class="navbar-nav ms-auto">
+      <div class="collapse navbar-collapse" id="navBar">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'index' %}">Home</a>
+          </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'index' %}">Home</a>
-                </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about' %}">About</a>
+          </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'about' %}">About</a>
-                </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'complain' %}">Complain</a>
+          </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'complain' %}">Complain</a>
-                </li>
+          {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle user-link" href="#" id="userDropdown" role="button"
+              data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="user-avatar">{{ user.username|first|upper }}</div>
+              <span class="ms-2">{{ user.username }}</span>
+            </a>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">
-                        Logout <strong>{{ request.user.username }}</strong>
-                    </a>
-                </li>
-
+            <ul class="dropdown-menu dropdown-menu-end user-dropdown">
+              <li>
+                <a class="dropdown-item" href="#">👤 Profile</a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">⚙ Settings</a>
+              </li>
+              <li>
+                <hr class="dropdown-divider" />
+              </li>
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout' %}">
+                  🚪 Logout
+                </a>
+              </li>
             </ul>
-        </div>
-
+          </li>
+          {% endif %}
+        </ul>
+      </div>
     </div>
-</nav>
+  </nav>
 
+  <!-- ================= HEADER ================= -->
 
-<div class="header">
-    <h1>Book Categories</h1>
-    <p>Browse all available books by categories</p>
-</div>
+  <div class="container">
+    <div class="header">
+      <h1>Book Categories</h1>
+      <p>Browse all available books by categories</p>
+    </div>
+  </div>
 
-<div class="container">
+  <!-- ================= CATEGORY LIST ================= -->
 
+  <div class="container">
     {% for category, book_list in category_data.items %}
-        <div class="cat-section mt-4">
-            <h2 class="category-title">{{ category }}</h2>
-            <hr>
+    <div class="cat-section mb-5">
+      <h2 class="category-title">{{ category }}</h2>
+      <hr />
 
-            <div class="row g-4">
-                {% for book in book_list %}
-                    <div class="col-md-3">
-                        <div class="book-card">
-                            {% if book.cover_image %}
-                                <img src="{{ book.cover_image.url }}" alt="{{ book.title }}">
-                            {% else %}
-                                <img src="{% static 'no-image.png' %}">
-                            {% endif %}
+      <div class="row g-4">
+        {% for book in book_list %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+          <a href="{% url 'book_detail' book.id %}" class="book-link">
+            <div class="book-card">
+              {% if book.cover_image %}
+              <img src="{{ book.cover_image.url }}" loading="lazy" alt="{{ book.title }}" />
+              {% else %}
+              <img src="{% static 'no-image.png' %}" alt="No Image" />
+              {% endif %}
 
-                            <h5 class="mt-2">{{ book.title }}</h5>
-                            <p class="text-muted">{{ book.author }}</p>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p class="empty-text">Books in this category are coming soon.</p>
-                {% endfor %}
+              <h5 title="{{ book.title }}">{{ book.title }}</h5>
+              <p class="text-muted">{{ book.author }}</p>
             </div>
-
+          </a>
         </div>
+        {% empty %}
+        <p class="empty-text">Books in this category are coming soon.</p>
+        {% endfor %}
+      </div>
+    </div>
     {% endfor %}
+  </div>
 
-</div>
-
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

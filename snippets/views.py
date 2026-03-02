@@ -1,3 +1,5 @@
+import time
+
 from rest_framework import viewsets
 from django.shortcuts import render, redirect,get_object_or_404
 from django.template.loader import get_template
@@ -14,7 +16,7 @@ from .models import Book, UserProfile, VisitorCount, Complaint
 from .serializers import BookSerializer, UserProfileSerializer
 from .forms import UserRegisterForm
 
-
+from .models import Category
 # =======================================================================
 #                               API VIEWSETS
 # =======================================================================
@@ -34,6 +36,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 # =======================================================================
 #                               HOME 
 # =======================================================================
+from django.core.cache import cache
 
 def home(request):
 
@@ -44,18 +47,22 @@ def home(request):
     search = request.GET.get("search")
     category_filter = request.GET.get("category")
 
-    books = Book.objects.all()
-
+    books = cache.get('all_books')
+    if not books:
+        books = Book.objects.all()
+        cache.set('all_books', books, 60 * 10)  # 10 minutes
+    
     if search:
         books = books.filter(
             models.Q(title__icontains=search) |
-            models.Q(author__icontains=search)
+            models.Q(author__icontains=search)|
+            models.Q(description__icontains=search)
         )
 
     if category_filter and category_filter != "All":
         books = books.filter(category=category_filter)
 
-    categories = Book.CATEGORY_CHOICES
+    categories = Category.objects.all()
 
     return render(request, "index.html", {
         "books": books,
@@ -67,7 +74,6 @@ def home(request):
 # =======================================================================
 def category(request):
     return render(request,"category.html")
-
 
 
 # =======================================================================
@@ -128,6 +134,7 @@ def register(request):
                 pass
 
             messages.success(request, "Account created successfully! Please log in.")
+            time.sleep(3)
             return redirect("login")
 
     else:
@@ -141,9 +148,12 @@ def register(request):
 # =======================================================================
 
 def login_view(request):
+    """
+    Handles login and redirects based on user role.
+    Always shows login page first if not authenticated.
+    """
 
-    # FIX: Allow authenticated users to visit /signup/
-    if request.user.is_authenticated and request.path != "/signup.html/":
+    if request.user.is_authenticated:
         return redirect_user_by_role(request.user)
 
     if request.method == "POST":
@@ -159,7 +169,7 @@ def login_view(request):
             messages.error(request, "Invalid username or password.")
 
     form = AuthenticationForm()
-    return render(request, 'login.html', {"form": form})
+    return render(request, "login.html", {"form": form})
 
 
 # =======================================================================
@@ -170,7 +180,6 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully!")
     return redirect("login")
-
 
 # =======================================================================
 #                          REDIRECT BY ROLE
@@ -273,41 +282,168 @@ def delete_user(request, user_id):
     return redirect("manage_users")
 
 
+# ==================== CHANGE ROLE  ======================
+from django.contrib.auth.models import Group
+
+@login_required
+def change_user_role(request, user_id):
+    if not request.user.is_staff:
+        return redirect("index")
+
+    user = get_object_or_404(User, id=user_id)
+
+    # Prevent editing yourself
+    if user == request.user:
+        messages.error(request, "You cannot change your own role.")
+        return redirect("manage_users")
+
+    if request.method == "POST":
+        new_role = request.POST.get("role")
+
+        # Remove old groups
+        user.groups.clear()
+
+        if new_role == "Admin":
+            user.is_staff = True
+            group, _ = Group.objects.get_or_create(name="Admin")
+            user.groups.add(group)
+
+        elif new_role == "Manager":
+            user.is_staff = False
+            group, _ = Group.objects.get_or_create(name="Manager")
+            user.groups.add(group)
+
+        else:
+            user.is_staff = False
+            group, _ = Group.objects.get_or_create(name="User")
+            user.groups.add(group)
+
+        user.save()
+        messages.success(request, f"{user.username}'s role updated successfully.")
+
+    return redirect("manage_users")
 
 
 
+# ==================== MANAGE CATEGORIES ======================
+from .models import Category
+
+@login_required
+def admin_manage_category(request):
+    if not request.user.is_staff:
+        return redirect("index")
+
+    if request.method == "POST":
+        category_name = request.POST.get("category_name")
+
+        if category_name:
+            Category.objects.get_or_create(name=category_name)
+            messages.success(request, "Category added successfully!")
+
+        return redirect("admin_manage_category")
+
+    categories = Category.objects.all().order_by("name")
+
+    return render(request, "dashboard/admin_manage_category.html", {
+        "categories": categories
+    })
+
+
+@login_required
+def delete_category(request, category_id):
+    if not request.user.is_staff:
+        return redirect("index")
+
+    category = get_object_or_404(Category, id=category_id)
+    category.delete()
+    messages.success(request, "Category deleted successfully!")
+    return redirect("admin_manage_category")
 
 
 
+#=====================ADD BOOK===============================
+from .models import Category
 
+@login_required
+def admin_add_book(request):
+    categories = Category.objects.all()
 
+    if request.method == "POST":
+        Book.objects.create(
+            title=request.POST.get("title"),
+            author=request.POST.get("author"),
+            publish_date=request.POST.get("publish_date"),
+            description=request.POST.get("description"),
+            category_id=request.POST.get("category"),
+            cover_image=request.FILES.get("cover_image"),
+            book_file=request.FILES.get("book_file"),
+            created_by=request.user
+        )
+
+        messages.success(request, "Book added successfully!")
+        return redirect("admin_dashboard")
+
+    return render(request, "dashboard/admin_add_book.html", {
+        "categories": categories
+    })
 
 
 # ==================== BOOK EDIT / DELETE ======================
 
-def edit_book(request, pk):
-    book = get_object_or_404(Book, pk=pk)
+@login_required
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if request.user.is_staff:
+        dashboard_redirect = "admin_dashboard"
+    elif request.user.groups.filter(name="Manager").exists():
+        if book.created_by != request.user:
+            messages.error(request, "You cannot edit this book.")
+            return redirect("manager_dashboard")
+        dashboard_redirect = "manager_dashboard"
+    else:
+        return redirect("index")
+
+    categories = Category.objects.all()
 
     if request.method == "POST":
         book.title = request.POST.get("title")
         book.author = request.POST.get("author")
         book.category = request.POST.get("category")
-        if "cover_image" in request.FILES:
-            book.cover_image = request.FILES["cover_image"]
+        book.description = request.POST.get("description")
+
+        if request.FILES.get("cover_image"):
+            book.cover_image = request.FILES.get("cover_image")
+
+        if request.FILES.get("book_file"):
+            book.book_file = request.FILES.get("book_file")
+
         book.save()
-
         messages.success(request, "Book updated successfully!")
-        return redirect("admin_dashboard")
+        return redirect(dashboard_redirect)
 
-    return render(request, "dashboard/edit_book.html", {"book": book})
+    return render(request, "dashboard/edit_book.html", {
+        "book": book,
+        "categories": categories
+    })
 
+@login_required
+def delete_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
 
-def delete_book(request, pk):
-    book = get_object_or_404(Book, pk=pk)
+    if request.user.is_staff:
+        redirect_to = "admin_dashboard"
+    elif request.user.groups.filter(name="Manager").exists():
+        if book.created_by != request.user:
+            messages.error(request, "You cannot delete this book.")
+            return redirect("manager_dashboard")
+        redirect_to = "manager_dashboard"
+    else:
+        return redirect("index")
+
     book.delete()
     messages.success(request, "Book deleted successfully!")
-    return redirect("admin_dashboard")
-
+    return redirect(redirect_to)
 
 
 
@@ -329,7 +465,7 @@ def manager_dashboard(request):
             models.Q(author__icontains=search)
         )
 
-    categories = Book.CATEGORY_CHOICES
+    categories = Category.objects.all()
 
     return render(request, "dashboard/manager_dashboard.html", {
         "books": books,
@@ -355,14 +491,14 @@ def my_books(request):
 
 @login_required
 def add_book(request):
-    categories = Book.CATEGORY_CHOICES
+    categories = Category.objects.all()
 
     if request.method == "POST":
         Book.objects.create(
             title=request.POST.get("title"),
             author=request.POST.get("author"),
             publish_date=request.POST.get("publish_date"),
-            category=request.POST.get("category"),
+            category_id=request.POST.get("category"),   # ✅ FIX
             description=request.POST.get("description"),
             cover_image=request.FILES.get("cover_image"),
             book_file=request.FILES.get("book_file"),
@@ -372,8 +508,9 @@ def add_book(request):
         messages.success(request, "Book added successfully!")
         return redirect("my_books")
 
-    return render(request, "dashboard/add_book.html", {"categories": categories})
-
+    return render(request, "dashboard/add_book.html", {
+        "categories": categories
+    })
 
 # =======================================================================
 #                          EDIT BOOK
@@ -381,18 +518,24 @@ def add_book(request):
 
 @login_required
 def edit_book(request, book_id):
-    book = Book.objects.get(id=book_id)
+    book = get_object_or_404(Book, id=book_id)
 
-    if book.created_by != request.user:
-        messages.error(request, "You cannot edit someone else's book!")
-        return redirect("my_books")
+    if request.user.is_staff:
+        dashboard_redirect = "admin_dashboard"
+    elif request.user.groups.filter(name="Manager").exists():
+        if book.created_by != request.user:
+            messages.error(request, "You cannot edit this book.")
+            return redirect("manager_dashboard")
+        dashboard_redirect = "manager_dashboard"
+    else:
+        return redirect("index")
 
-    categories = Book.CATEGORY_CHOICES
+    categories = Category.objects.all()
 
     if request.method == "POST":
         book.title = request.POST.get("title")
         book.author = request.POST.get("author")
-        book.category = request.POST.get("category")
+        book.category_id = request.POST.get("category") 
         book.description = request.POST.get("description")
 
         if request.FILES.get("cover_image"):
@@ -403,12 +546,24 @@ def edit_book(request, book_id):
 
         book.save()
         messages.success(request, "Book updated successfully!")
-        return redirect("my_books")
+        return redirect(dashboard_redirect)
 
     return render(request, "dashboard/edit_book.html", {
         "book": book,
         "categories": categories
     })
+
+
+
+@login_required
+def admin_manage_books(request):
+    if not request.user.is_staff:
+        return redirect("index")
+
+    books = Book.objects.all().order_by("-id")
+    return render(request, "dashboard/admin_manage_books.html", {"books": books})
+
+
 
 
 # =======================================================================
@@ -417,30 +572,47 @@ def edit_book(request, book_id):
 
 @login_required
 def delete_book(request, book_id):
-    book = Book.objects.get(id=book_id)
+    book = get_object_or_404(Book, id=book_id)
 
-    if book.created_by != request.user:
-        messages.error(request, "You cannot delete someone else's book!")
-        return redirect("my_books")
+    if request.user.is_staff:
+        redirect_to = "admin_dashboard"
+    elif request.user.groups.filter(name="Manager").exists():
+        if book.created_by != request.user:
+            messages.error(request, "You cannot delete this book.")
+            return redirect("manager_dashboard")
+        redirect_to = "manager_dashboard"
+    else:
+        return redirect("index")
 
     book.delete()
     messages.success(request, "Book deleted successfully!")
-    return redirect("my_books")
-
-
+    return redirect(redirect_to)
 # =======================================================================
 #                          BOOK DETAIL
 # =======================================================================
 
+
+from .models import ReadingHistory
+from django.utils import timezone
+
 @login_required
 def book_detail(request, id):
-    book = Book.objects.get(id=id)
+    book = get_object_or_404(Book, id=id)
+
+    # Increase view count
     book.views += 1
     book.save()
 
+    # Track reading history
+    history, created = ReadingHistory.objects.get_or_create(
+        user=request.user,
+        book=book
+    )
+
+    history.last_read = timezone.now()
+    history.save()
+
     return render(request, "book_detail.html", {"book": book})
-
-
 # =======================================================================
 #                       READ BOOK (PDF VIEWER PAGE)
 # =======================================================================
@@ -451,7 +623,7 @@ def read_book(request, id):
     book.views += 1
     book.save()
 
-    return render(request, "read_book.html", {"book": book})
+    return render(request, "dashboard/read_book.html", {"book": book})
 
 
 # =======================================================================
@@ -470,55 +642,42 @@ def download_book(request, id):
 # =======================================================================
 #                       BOOK CATEGORIES
 # =======================================================================
-def book_categories(request):
-
-    # search functionality
-    q = request.GET.get('q', '').strip()
-
-    # get all category names from BOOK choices
-    all_categories = [c[0] for c in Book.CATEGORY_CHOICES]
-
-    # if search entered → filter categories
-    if q:
-        categories = [c for c in all_categories if q.lower() in c.lower()]
-    else:
-        categories = all_categories
-
-    # fetch all books (template filters them)
-    books = Book.objects.all()
-
-    return render(request, 'category.html', {
-        'categories': categories,
-        'books': books,
-        'query': q,
-    })
+from .models import Category
 
 def book_categories(request):
-    books = Book.objects.all()
-    categories = books.values_list("category", flat=True).distinct()
+    categories = Category.objects.prefetch_related("books").all()
 
     category_data = {}
 
-    for cat in categories:
-        category_data[cat] = books.filter(category=cat)
+    for category in categories:
+        category_data[category.name] = category.books.all()
 
     return render(request, "category.html", {
         "category_data": category_data,
     })
+    
 
 @login_required
 def complain_view(request):
     if request.method == "POST":
+
+        complaint_type = request.POST.get("complaint_type")
+
+        if not complaint_type:
+            messages.error(request, "Please select complaint type.")
+            return redirect("complain")
+
         Complaint.objects.create(
             user=request.user,
-            book_title=request.POST.get('book_title'),
-            complaint_type=request.POST.get('complaint_type'),
-            message=request.POST.get('message')
+            book_title=request.POST.get("book_title"),
+            complaint_type=complaint_type,
+            message=request.POST.get("message")
         )
-        messages.success(request, "Complaint submitted successfully!")
-        return redirect('index')
 
-    return render(request, 'complain.html')
+        messages.success(request, "Complaint submitted successfully!")
+        return redirect("index")
+
+    return render(request, "complain.html")
 
 
 # Only admin/staff can view complaints
@@ -529,11 +688,16 @@ def admin_complaints(request):
 
 
 
+from .models import Category
+from django.contrib.auth.decorators import user_passes_test
+
+
 # =======================================================================
 #                       ANALAYTICS PAGE
 # =======================================================================
-
-
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Count
 
 def analytics(request):
 
@@ -558,6 +722,21 @@ def analytics(request):
     # --- LATEST COMPLAINTS ---
     latest_complaints = Complaint.objects.order_by('-id')[:5]
 
+    # Most Read Books
+    most_read_books = Book.objects.annotate(
+        read_count=Count('reading_history')
+    ).order_by('-read_count')[:5]
+
+    # Active Users (Last 7 Days)
+    active_users_7days = User.objects.filter(
+        last_login__gte=timezone.now() - timedelta(days=7)
+    ).count()
+
+    # Monthly Growth
+    monthly_users = User.objects.extra(
+        select={'month': "strftime('%%m', date_joined)"}
+    ).values('month').annotate(count=Count('id'))
+        
     return render(request, "dashboard/analytics.html", {
         "total_books": total_books,
         "total_users": total_users,
@@ -572,4 +751,42 @@ def analytics(request):
 
         "latest_books": latest_books,
         "latest_complaints": latest_complaints,
+    })     
+    
+    
+
+# =======================================================================
+#                       USER DASHBOARD
+# =======================================================================    
+
+@login_required
+def user_dashboard(request):
+
+    # Continue Reading
+    continue_reading = ReadingHistory.objects.filter(
+        user=request.user,
+        progress__lt=100
+    ).order_by('-last_read')[:5]
+
+    # Recently Viewed
+    recently_viewed = ReadingHistory.objects.filter(
+        user=request.user
+    ).order_by('-last_read')[:5]
+
+    # Recommendations (simple logic: same category as last read)
+    last_read = ReadingHistory.objects.filter(
+        user=request.user
+    ).order_by('-last_read').first()
+
+    recommended_books = []
+
+    if last_read:
+        recommended_books = Book.objects.filter(
+            category=last_read.book.category
+        ).exclude(id=last_read.book.id)[:6]
+
+    return render(request, "dashboard/user_dashboard.html", {
+        "continue_reading": continue_reading,
+        "recently_viewed": recently_viewed,
+        "recommended_books": recommended_books,
     })

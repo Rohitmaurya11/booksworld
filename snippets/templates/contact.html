@@ -1,206 +1,298 @@
-{% load static %}
-{% load crispy_forms_tags %}
+{% load static %} {% load crispy_forms_tags %}
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Us</title>
 
     <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
 
     <style>
-        body {
-            background: #cbd4eb;
-            font-family: 'Poppins', sans-serif;
-        }
+      body {
+        background: #cbd4eb;
+        font-family: "Poppins", sans-serif;
+        padding-top: 80px;
+      }
 
-        .header {
-            background: linear-gradient(135deg, #007bff, #6610f2);
-            padding: 30px 20px;
-            color: white;
-            text-align: center;
-        }
+      /* ================= NAVBAR (FIXED STYLE) ================= */
 
-        .header h1 {
-            font-size: 42px;
-            font-weight: 700;
-        }
+      .navbar {
+        background: #506dab !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        padding: 12px 0;
+      }
 
-        .contact-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            padding: 30px;
-        }
+      .navbar-brand {
+        font-weight: 600;
+        font-size: 20px;
+      }
 
-        .info-box {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            transition: 0.3s;
-        }
+      .navbar .nav-link {
+        color: #e5e7eb !important;
+        margin-left: 15px;
+        position: relative;
+        transition: 0.3s ease;
+      }
 
-        .info-box:hover {
-            transform: translateY(-5px);
-        }
+      .navbar .nav-link:hover {
+        color: white !important;
+      }
 
-        .info-icon {
-            font-size: 35px;
-            color: #007bff;
-        }
+      .navbar .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0%;
+        height: 2px;
+        background: white;
+        transition: 0.3s ease;
+      }
 
-        .map iframe {
-            border-radius: 15px;
-            width: 100%;
-            height: 300px;
-            border: 0;
-        }
+      .navbar .nav-link:hover::after {
+        width: 100%;
+      }
+
+      /* USER DROPDOWN (Bootstrap 5 Compatible) */
+
+      .user-link {
+        display: flex;
+        align-items: center;
+      }
+
+      .user-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f7cff, #6236ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .dropdown-menu {
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      /* ================= PAGE CONTENT ================= */
+
+      .header {
+        background: linear-gradient(135deg, #007bff, #6610f2);
+        padding: 30px 20px;
+        color: white;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 42px;
+        font-weight: 700;
+      }
+
+      .contact-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+      }
+
+      .info-box {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        transition: 0.3s;
+      }
+
+      .info-box:hover {
+        transform: translateY(-5px);
+      }
+
+      .info-icon {
+        font-size: 35px;
+        color: #007bff;
+      }
+
+      .map iframe {
+        border-radius: 15px;
+        width: 100%;
+        height: 300px;
+        border: 0;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <!-- ================= NAVBAR ================= -->
 
-<!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'index' %}">
+          📚 <strong>Book</strong> World
+        </a>
 
-        <a class="navbar-brand" href="{% url 'index' %}">📚 Book World</a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavBar">
-            <span class="navbar-toggler-icon"></span>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNavBar"
+        >
+          <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavBar">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'index' %}">Home</a>
+            </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'index' %}">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'category' %}">
+                <i class="bi bi-book-half"></i> Categories
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'about' %}">
+                <i class="bi bi-info-circle"></i> About
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'complain' %}">
+                <i class="bi bi-chat-text"></i> Complain
+              </a>
+            </li>
+
+            {% if user.is_authenticated %}
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle user-link"
+                href="#"
+                data-bs-toggle="dropdown"
+              >
+                <div class="user-avatar">{{ user.username|first|upper }}</div>
+
+                <span class="ms-2">{{ user.username }}</span>
+              </a>
+
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                  <a class="dropdown-item" href="#">Profile</a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'category' %}">
-                        <i class="bi bi-book-half"></i> Categories
-                    </a>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a
+                    class="dropdown-item text-danger"
+                    href="{% url 'logout' %}"
+                  >
+                    Logout
+                  </a>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'about' %}">
-                        <i class="bi bi-info-circle"></i> About
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'complain' %}">
-                        <i class="bi bi-chat-text"></i> Complain
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">
-                        <i class="bi bi-box-arrow-right"></i> Logout
-                        <strong>{{ user.username }}</strong>
-                    </a>
-                </li>
-
-            </ul>
+              </ul>
+            </li>
+            {% endif %}
+          </ul>
         </div>
+      </div>
+    </nav>
 
-    </div>
-</nav>
-<!-- ================= NAVBAR END ================= -->
+    <!-- ================= NAVBAR END ================= -->
 
-<!-- HEADER -->
-<div class="header">
-    <h1>Contact Us</h1>
-    <p>We would love to hear from you! Reach out to us anytime.</p>
-</div>
-
-<div class="container mt-5 mb-5">
-
-    <!-- CONTACT FORM + DETAILS -->
-    <div class="row g-4">
-        <div class="col-lg-6">
-            <div class="contact-card">
-                <h3 class="mb-4">Send Us a Message</h3>
-
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button class="btn btn-primary mt-2 w-100" type="submit">Send Message</button>
-                </form>
-            </div>
-        </div>
-
-        <!-- CONTACT INFORMATION -->
-        <div class="col-lg-6">
-            <div class="row g-4">
-
-                <div class="col-md-12">
-                    <div class="info-box d-flex align-items-center">
-                        <div class="info-icon me-3">📞</div>
-                        <div>
-                            <h5>Phone</h5>
-                            <p class="mb-0">+91 9876543210</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <div class="info-box d-flex align-items-center">
-                        <div class="info-icon me-3">📧</div>
-                        <div>
-                            <h5>Email</h5>
-                            <p class="mb-0">support@example.com</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <div class="info-box d-flex align-items-center">
-                        <div class="info-icon me-3">📍</div>
-                        <div>
-                            <h5>Office Address</h5>
-                            <p class="mb-0">123, Kirti Nagar, New Delhi, 110015 India</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-12">
-                    <div class="info-box d-flex align-items-center">
-                        <div class="info-icon me-3">💬</div>
-                        <div>
-                            <h5>Live Chat</h5>
-                            <p class="mb-0">Chat with us from 9am–6pm IST</p>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
+    <!-- HEADER -->
+    <div class="header">
+      <h1>Contact Us</h1>
+      <p>We would love to hear from you! Reach out to us anytime.</p>
     </div>
 
-    <!-- MAP -->
-    <div class="mt-5">
+    <div class="container mt-5 mb-5">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="contact-card">
+            <h3 class="mb-4">Send Us a Message</h3>
+
+            <form method="post">
+              {% csrf_token %} {{ form|crispy }}
+              <button  class="btn btn-primary mt-2 w-100" type="submit">
+                Send Message
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="row g-4">
+            <div class="col-md-12">
+              <div class="info-box d-flex align-items-center">
+                <div class="info-icon me-3">📞</div>
+                <div>
+                  <h5>Phone</h5>
+                  <p class="mb-0">+91 9876543210</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="info-box d-flex align-items-center">
+                <div class="info-icon me-3">📧</div>
+                <div>
+                  <h5>Email</h5>
+                  <p class="mb-0">support@example.com</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="info-box d-flex align-items-center">
+                <div class="info-icon me-3">📍</div>
+                <div>
+                  <h5>Office Address</h5>
+                  <p class="mb-0">123, Main Street, New Delhi, 110005 India</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12">
+              <div class="info-box d-flex align-items-center">
+                <div class="info-icon me-3">💬</div>
+                <div>
+                  <h5>Live Chat</h5>
+                  <p class="mb-0">Chat with us from 9am–6pm IST</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5">
         <h3 class="text-center mb-3">Our Location</h3>
         <div class="map">
-            <iframe 
-                src="https://www.google.com/maps/@28.6515572,77.1369513,15.63z"
-                allowfullscreen="" loading="lazy">
-            </iframe>
+          <iframe
+            src="https://www.google.com/maps/@28.6158582,77.2112027,3637m/data=!3m1!1e3?entry=ttu&g_ep=EgoyMDI2MDIyMy4wIKXMDSoASAFQAw%3D%3D"
+            allowfullscreen=""
+            loading="lazy"
+          >
+          </iframe>
         </div>
+      </div>
     </div>
 
-</div>
-
-<!-- Bootstrap 5 JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

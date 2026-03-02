@@ -6,6 +6,7 @@ class VisitorMiddleware:
 
     def __call__(self, request):
         obj, created = VisitorCount.objects.get_or_create(id=1)
+        created += 1
         obj.count += 1
         obj.save()
         return self.get_response(request)

@@ -1,67 +1,200 @@
-<style>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
 
-h2{
-    text-align: center;
-    font-family:'Times New Roman', Times, serif;
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Book</title>
 
-}
-.form{
-    font-family:'Times New Roman', Times, serif;
-    display: grid;
-    max-width: 850px;
-    color: black;
-    font-weight: 700;
-    font-size: 24px;
-    gap: 10px;
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
-    border: 2px solid;
-    display:flexbox;
-    margin: 30px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
-}
-a{
-    text-decoration: underline;
-    text-align: center;
-}
-input,textarea{
+    <!-- Bootstrap (if not already included globally) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    font-family:'Times New Roman', Times, serif;
-    font-size: 16px;
-    border-radius: 2px;
-    border: 2px solid black;
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f6f9ff, #eef2ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-}
+        .page-wrapper {
+            width: 100%;
+            padding: 40px 20px;
+        }
 
+        .form-card {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            transition: 0.3s ease;
+        }
 
-</style>
-<h2 class="text-primary fw-bold ">✏ Edit Book</h2>
+        .form-card:hover {
+            transform: translateY(-4px);
+        }
 
-<form class="form" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+        .page-title {
+            font-size: 30px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #4f7cff, #6236ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    <label class="form-label">Book Title</label>
-    <input type="text" name="title" value="{{ book.title }}" class="form-control mb-3">
+        label {
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #555;
+        }
 
-    <label class="form-label">Author</label>
-    <input type="text" name="author" value="{{ book.author }}" class="form-control mb-3">
+        .form-control,
+        select,
+        textarea {
+            border-radius: 12px !important;
+            border: 1px solid #ddd !important;
+            padding: 12px 14px !important;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
 
-    <!-- <label class="form-label">Publish Date</label> -->
-    <!-- <input type="date" name="publish_date" value="{{ book.publish_date }}" class="form-control mb-3"> -->
+        .form-control:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #4f7cff !important;
+            box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.15) !important;
+        }
 
-    <label class="form-label">Category</label>
-    <select name="category" class="form-control mb-3">
-        {% for key, value in categories %}
-            <option value="{{ key }}" {% if book.category == key %}selected{% endif %}>{{ value }}</option>
-        {% endfor %}
-    </select>
+        textarea {
+            min-height: 120px;
+            resize: none;
+        }
 
-    <label>Description</label>
-    <textarea name="description" class="form-control mb-3">{{ book.description }}</textarea><br>
+        .btn-primary-custom {
+            background: linear-gradient(135deg, #4f7cff, #6236ff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 14px;
+            font-weight: 600;
+            transition: 0.3s ease;
+            color: white;
+        }
 
-    <button class="btn btn-primary">Update Book</button>
-    <br>
-    <a href="{% url 'my_books' %}" class="btn btn-secondary">Back</a>
-</form>
+        .btn-primary-custom:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(79, 124, 255, 0.35);
+        }
+
+        .btn-secondary-custom {
+            background: #f1f3f6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 14px;
+            font-weight: 500;
+            color: #555;
+            transition: 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #e4e7ec;
+            transform: translateY(-2px);
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        @media(max-width: 768px) {
+            .form-card {
+                padding: 25px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .button-group a,
+            .button-group button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <div class="form-card">
+
+            <h2 class="page-title">✏ Edit Book</h2>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label>Book Title</label>
+                    <input type="text" name="title" value="{{ book.title }}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Author</label>
+                    <input type="text" name="author" value="{{ book.author }}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Category</label>
+                    <select name="category" class="form-control">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if book.category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Description</label>
+                    <textarea name="description" class="form-control">{{ book.description }}</textarea>
+                </div>
+
+                <div class="button-group">
+                    <a href="{% url 'my_books' %}" class="btn-secondary-custom">
+                        ← Back
+                    </a>
+
+                    <button type="submit" class="btn-primary-custom">
+                        Update Book
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

@@ -107,7 +107,7 @@
         <!-- Left: Book Cover -->
         <div class="col-md-4 text-center">
             {% if book.cover_image %}
-            <img src="{{ book.cover_image.url }}" class="book-cover">
+            <img src="{{ book.cover_image.url }}" loading="lazy" class="book-cover">
             {% else %}
             <img src="{% static 'no-image.png' %}" class="book-cover">
             {% endif %}

@@ -18,17 +18,94 @@
         font-size: 17px;
         font-weight: 600;
     }
+
+    .manager-navbar {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    padding: 14px 0;
+}
+
+.manager-navbar .navbar-brand {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+.logo-box {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 18px;
+}
+
+.nav-modern .nav-link {
+    color: rgba(255,255,255,0.85) !important;
+    margin-left: 18px;
+    font-weight: 500;
+    position: relative;
+    transition: 0.3s ease;
+}
+
+.nav-modern .nav-link:hover {
+    color: white !important;
+}
+
+.nav-modern .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background: white;
+    transition: 0.3s ease;
+}
+
+.nav-modern .nav-link:hover::after,
+.nav-modern .nav-link.active::after {
+    width: 100%;
+}
+
+.user-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.15);
+    padding: 6px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+    transition: 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.25);
+    color: white;
+}
+
 </style>
 <body>
     
 
 
 <!-- NAVBAR WITH CRUD LINKS -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top custom-nav">
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top manager-navbar">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="{% url 'manager_dashboard' %}">
-            📘 Manager Panel
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'manager_dashboard' %}">
+            <span class="logo-box">📘</span>
+            <span class="ms-2">Manager Panel</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#managerNavbar">
@@ -37,11 +114,20 @@
 
         <div class="collapse navbar-collapse" id="managerNavbar">
 
-            <ul class="navbar-nav me-auto">
+            <ul class="navbar-nav me-auto nav-modern">
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+                       href="{% url 'index' %}">
+                        Main Content
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'manager_dashboard' %}active{% endif %}"
-                       href="{% url 'manager_dashboard' %}">Dashboard</a>
+                       href="{% url 'manager_dashboard' %}">
+                        Dashboard
+                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -51,25 +137,29 @@
                     </a>
                 </li>
 
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-center">
+
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'add_book' %}active{% endif %}"
-                       href="{% url 'add_book' %}">
-                        Add New Book
+                    <div class="user-badge">
+                        {{ request.user.username|first|upper }}
+                    </div>
+                </li>
+
+                <li class="nav-item ms-2">
+                    <span class="nav-link text-light fw-semibold">
+                        {{ request.user.username }}
+                    </span>
+                </li>
+
+                <li class="nav-item ms-3">
+                    <a class="logout-btn" href="{% url 'logout' %}">
+                        Logout
                     </a>
                 </li>
 
             </ul>
-
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <span class="nav-link text-light">Hello, {{ request.user.username }}</span>
-                </li>
-
-                <li class="nav-item">
-                    <a class="btn btn-danger btn-sm ms-2" href="{% url 'logout' %}">Logout</a>
-                </li>
-            </ul>
-            
 
         </div>
     </div>
